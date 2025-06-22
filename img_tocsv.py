@@ -10,6 +10,14 @@ from datetime import datetime
 from ev_map import ev_scene 
 
 def singleimg(file, folder=""):
+			
+			#defining tags that correlate with image brightness
+			brighttags={
+				0x9003: "Time of Day",
+  	  		0x829D: "Aperture",
+	 		   0x829A: "Shutter Speed",
+  			  0x8827: "ISO"
+			}
 			image_path=folder+file
 			image=Image.open(image_path)
 			exif_data=image._getexif()
@@ -39,13 +47,6 @@ def singleimg(file, folder=""):
 
 def folder_tocsv(folder, save, img_count=None):
 	
-	#defining tags that correlate with image brightness
-	brighttags={
-		0x9003: "Time of Day",
-  	  0x829D: "Aperture",
-	    0x829A: "Shutter Speed",
-  	  0x8827: "ISO"
-	}
 	data=[] #collective exif data
 	count=0 #counter for no of images 
 	
@@ -53,7 +54,7 @@ def folder_tocsv(folder, save, img_count=None):
 	for file in os.listdir(folder):
 		if file.lower().endswith(('.jpg', '.jpeg', '.png', '.raw')):
 			#extracting exif for each image
-			singleimg(file,folder)
+			metadata=singleimg(file,folder)
 			
 			#calculation and insertion of ev
 			val=list(metadata.values())
