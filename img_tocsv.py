@@ -9,22 +9,7 @@ from PIL import Image
 from datetime import datetime
 from ev_map import ev_scene 
 
-
-def imgexif_tocsv(folder, save, img_count=None):
-	
-	#defining tags that correlate with image brightness
-	brighttags={
-		0x9003: "Time of Day",
-  	  0x829D: "Aperture",
-	    0x829A: "Shutter Speed",
-  	  0x8827: "ISO"
-	}
-	data=[] #collective exif data
-	count=0 #counter for no of images 
-	
-	#accessing images individually 
-	for file in os.listdir(folder):
-		if file.lower().endswith(('.jpg', '.jpeg', '.png', '.raw')):
+def singleimg(file, folder=""):
 			image_path=folder+file
 			image=Image.open(image_path)
 			exif_data=image._getexif()
@@ -50,22 +35,37 @@ def imgexif_tocsv(folder, save, img_count=None):
 					if isinstance(value, tuple) and len(value)==2 and value[1]!=0:
 						value=round(value[0] / value[1], 2)
 					metadata[tag_name]=value
-				
-				#calculation and insertion of ev
-				val=list(metadata.values())
-				if None not in val and 0 not in val:
+			return metadata
+
+def folder_tocsv(folder, save, img_count=None):
+	
+	#defining tags that correlate with image brightness
+	brighttags={
+		0x9003: "Time of Day",
+  	  0x829D: "Aperture",
+	    0x829A: "Shutter Speed",
+  	  0x8827: "ISO"
+	}
+	data=[] #collective exif data
+	count=0 #counter for no of images 
+	
+	#accessing images individually 
+	for file in os.listdir(folder):
+		if file.lower().endswith(('.jpg', '.jpeg', '.png', '.raw')):
+			#extracting exif for each image
+			singleimg(file,folder)
+			
+			#calculation and insertion of ev
+			val=list(metadata.values())
+			if None not in val and 0 not in val:
 					ev=math.log((100*(val[1]**2))/(val[2]*val[3]), 2)
 					metadata["EV"]=ev
 					metadata["scene"]=ev_scene(ev)
-					#calculation and insertion of brightness
-					#gray=image.convert('L')
-					#bright=np.asarray(gray).mean()
-					#metadata["Brightness"]=bright
-				else:
+			else:
 					print(f"Incomplete EXIF found in {file}")
 					print(" >File dropped")
 					continue
-				
+			
 			#appending individual image exif
 			data.append(metadata)
 			
