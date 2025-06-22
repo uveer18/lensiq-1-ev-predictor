@@ -23,12 +23,19 @@ y_ext=df['EV']
 model=joblib.load("ev_predict.pkl")
 y_epred=model.predict(X_ext)
 
-df["Predictions"]=y_epred
-df["Scene"]=df["Predictions"].apply(lambda x: ev_scene(x))
+df["Predicted EV"]=y_epred
+df["Scene"]=df["Predicted EV"].apply(lambda x: ev_scene(x))
 
-print(df[["Predictions", "Scene"]])
+print("EV Predictions with mapped Scene ")
+print(df[["Predicted EV", "Scene"]])
 
 mse=mean_squared_error (y_ext, y_epred)
 r2=r2_score (y_ext, y_epred)
 print("MSE: ", mse)
 print("R² score: ", r2)
+
+print("Plots for visual analysis: ")
+compare_ev(y_ext, y_epred)
+residualplot(y_ext, y_epred)
+ev_time(df)
+ev_features(df)
