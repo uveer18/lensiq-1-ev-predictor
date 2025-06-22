@@ -1,4 +1,4 @@
-#exif analyser and csv generator module of EXIF Predictor package of LensIQ Suite 
+#image exif analyser, csv generator and ev calculator tool of EXIF Predictor module of LensIQ Suite 
 
 
 import os
@@ -7,34 +7,10 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from datetime import datetime
-
-def ev_scene(ev, nd_stops=0):
-    adjusted_ev = round(ev + nd_stops)
-    mapping = {
-        -3: "Candlelight (very dim)",
-        -2: "Full moonlight",
-        -1: "Dim night street",
-         0: "Night city w/ lamps",
-         1: "Twilight (blue hour)",
-         2: "Moody candlelit indoor",
-         3: "Bar/restaurant lighting",
-         4: "Bright indoor w/ windows",
-         5: "Window-lit overcast scene",
-         6: "Overcast outdoor",
-         7: "Open shade, late evening",
-         8: "Cloudy daylight",
-         9: "Shade on sunny day",
-        10: "Soft daylight",
-        11: "Sunny daylight",
-        12: "Bright beach or sand",
-        13: "Snow in sun",
-        14: "Reflective water / mountains",
-        15: "Direct noon sun (extreme brightness)"
-    }
-    return mapping.get(adjusted_ev, f"EV {adjusted_ev} scene not defined")
+from ev_map import ev_scene 
 
 
-def exif_tocsv(folder, save, img_count=None):
+def imgexif_tocsv(folder, save, img_count=None):
 	
 	#defining tags that correlate with image brightness
 	brighttags={
@@ -80,7 +56,7 @@ def exif_tocsv(folder, save, img_count=None):
 				if None not in val and 0 not in val:
 					ev=math.log((100*(val[1]**2))/(val[2]*val[3]), 2)
 					metadata["EV"]=ev
-					metadata["scene"]=tag_ev(ev)
+					metadata["scene"]=ev_scene(ev)
 					#calculation and insertion of brightness
 					#gray=image.convert('L')
 					#bright=np.asarray(gray).mean()
