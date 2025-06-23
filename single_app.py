@@ -16,7 +16,7 @@ df=pd.DataFrame([data])
 df=preprocess(df)
 df=df[['Aperture', 'log_ss', 'log_iso', 'sin_time']]
 
-model=joblib.load("linear.pkl")
+model=joblib.load("ev_predict.pkl")
 ev=model.predict(df)[0]
 
 print("Predicted EV: ", ev)
